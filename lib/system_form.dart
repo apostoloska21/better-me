@@ -47,31 +47,48 @@ class _SystemFormPageState extends State<SystemFormPage> {
   Future<void> _addHabit() async {
     if (_current == null) return;
     _habitController.clear();
-    final result = await showDialog<String>(
+    final result = await showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
-        return AlertDialog(
-          title: const Text('New habit'),
-          content: TextField(
-            controller: _habitController,
-            autofocus: true,
-            textInputAction: TextInputAction.done,
-            decoration: const InputDecoration(
-              hintText: 'e.g. Drink water',
-              border: OutlineInputBorder(),
-            ),
-            onSubmitted: (v) => Navigator.of(context).pop(v.trim()),
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(_habitController.text.trim()),
-              child: const Text('Add'),
-            ),
-          ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('New habit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _habitController,
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  hintText: 'e.g. Drink water',
+                  border: OutlineInputBorder(),
+                ),
+                onSubmitted: (v) => Navigator.of(context).pop(v.trim()),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => Navigator.of(context).pop(_habitController.text.trim()),
+                  child: const Text('Add habit'),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -85,12 +102,12 @@ class _SystemFormPageState extends State<SystemFormPage> {
     final isEdit = _current != null;
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit system' : 'New system'),
+        title: Text(isEdit ? 'Edit system' : 'New system', style: const TextStyle(fontWeight: FontWeight.w700)),
         actions: [
           if (isEdit)
             IconButton(
               tooltip: 'Done',
-              icon: const Icon(Icons.check),
+              icon: const Icon(Icons.check, color: Color(0xFF1F59D1)),
               onPressed: () => Navigator.of(context).pop(true),
             )
         ],
@@ -130,7 +147,7 @@ class _SystemFormPageState extends State<SystemFormPage> {
                   const Text('Habits', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   IconButton(
                     tooltip: 'Add habit',
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(Icons.add, color: Color(0xFF1F59D1)),
                     onPressed: _addHabit,
                   ),
                 ],
@@ -148,17 +165,17 @@ class _SystemFormPageState extends State<SystemFormPage> {
                             key: ValueKey(habit.id),
                             direction: DismissDirection.endToStart,
                             background: Container(
-                              color: Colors.red,
+                              color: const Color(0xFFE53935),
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 16),
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child: const Icon(Icons.delete_outline, color: Colors.white),
                             ),
                             onDismissed: (_) async {
                               await widget.controller.deleteHabit(_current!, habit);
                               setState(() {});
                             },
                             child: ListTile(
-                              title: Text(habit.name),
+                              title: Text(habit.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                               subtitle: Text('Created ${_formatDate(habit.createdAt)}  •  Streak: ${habit.streak}'),
                             ),
                           );
